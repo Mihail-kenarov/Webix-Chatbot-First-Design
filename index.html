@@ -67,6 +67,57 @@
       border-radius: 5px !important;
       padding: 5px !important;
     }
+
+    /* Message styling with fixed word wrap */
+    .user-message {
+      background-color: #e6f2ff;
+      padding: 8px 12px;
+      border-radius: 12px;
+      margin: 4px 20px 4px 4px;
+      text-align: right;
+      align-self: flex-end;
+      width: auto;
+      max-width: 80%;
+      word-wrap: break-word;
+      white-space: normal;
+      display: inline-block;
+      float: right;
+      clear: both;
+    }
+
+    .ai-message {
+      background-color: #f0f0f0;
+      padding: 8px 12px;
+      border-radius: 12px;
+      margin: 4px 4px 4px 20px;
+      text-align: left;
+      width: auto;
+      max-width: 80%;
+      word-wrap: break-word;
+      white-space: normal;
+      display: inline-block;
+      float: left;
+      clear: both;
+    }
+
+    .loading-indicator {
+      color: #888;
+      font-style: italic;
+    }
+
+    /* Clear float for better message display */
+    .message-wrapper {
+      overflow: hidden;
+      margin-bottom: 8px;
+      width: 100%;
+    }
+
+    /* Custom list styling to fix word wrapping */
+    .chat-list .webix_list_item {
+      padding: 0 !important;
+      height: auto !important;
+      line-height: normal !important;
+    }
   </style>
   
 </head>
@@ -78,6 +129,19 @@
 // -------------------------------
 async function askAI(question) {
   try {
+    // Option 1: Using the direct endpoint
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: question
+      })
+    });
+
+    /* 
+    // Option 2: Using the proxy middleware
     const response = await fetch('/api/ollama/generate', {
       method: 'POST',
       headers: {
@@ -92,6 +156,7 @@ async function askAI(question) {
         }
       })
     });
+    */
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -104,7 +169,8 @@ async function askAI(question) {
       throw new Error(data.error);
     }
     
-    return data.response || "No response";
+    // Option 1 returns data.text while Option 2 returns data.response
+    return data.text || data.response || "No response";
   } catch (err) {
     console.error("Ollama error:", err);
     return `Error: ${err.message}. Make sure Ollama is running on port 11434`;
@@ -118,23 +184,23 @@ webix.ui({
   rows: [
     // 🟢 Top Toolbar
     {
-  view: "toolbar",
-  css: "webix_dark",
-  padding: 10,
-  elements: [
-    { 
-      view: "label",
-      label: "<span style='font-size:18px; color:white;'>Webix + Ollama Demo</span>" 
+      view: "toolbar",
+      css: "webix_dark",
+      padding: 10,
+      elements: [
+        { 
+          view: "label",
+          label: "<span style='font-size:18px; color:white;'>Webix + Ollama Demo</span>" 
+        },
+        {
+          view: "icon", 
+          icon: "mdi mdi-robot-confused-outline",
+          css: "webix_icon mdi",  // Add this to ensure proper styling
+          tooltip: "Ask AI",
+          click: function() { $$("aiPopup").show(); }
+        }
+      ]
     },
-    {
-      view: "icon", 
-      icon: "mdi mdi-robot-confused-outline",
-      css: "webix_icon mdi",  // Add this to ensure proper styling
-      tooltip: "Ask AI",
-      click: function() { $$("aiPopup").show(); }
-    }
-  ]
-},
     // 🟢 Data Table
     {
       view: "datatable",
@@ -167,7 +233,7 @@ webix.ui({
     css: "webix_dark",
     cols: [
       { view: "label", 
-      label: "<span style='color:white;'>Ask AI</span>" },
+        label: "<span style='color:white;'>Ask AI</span>" },
       {
         view: "icon", 
         icon: "wxi-close",
@@ -180,9 +246,22 @@ webix.ui({
       {
         view: "list",
         id: "chatList",
-        template: "#text#",
+        css: "chat-list",
+        type: {
+          height: "auto"  // Allow dynamic height for messages
+        },
+        template: function(obj) {
+          if (obj.type === 'user') {
+            return `<div class="message-wrapper"><div class="user-message">${obj.text}</div></div>`;
+          } else if (obj.type === 'loading') {
+            return `<div class="message-wrapper"><div class="ai-message loading-indicator">${obj.text}</div></div>`;
+          } else { // AI
+            return `<div class="message-wrapper"><div class="ai-message">${obj.text}</div></div>`;
+          }
+        },
         scroll: "y",
-        gravity: 3
+        gravity: 3,
+        autoheight: false
       },
       {
         height: 50,
@@ -191,37 +270,63 @@ webix.ui({
             view: "text", 
             id: "chatInput", 
             placeholder: "Type your question...",
-            gravity: 2
+            gravity: 2,
+            on: {
+              onKeyPress: function(code, e) {
+                if (code === 13) { // Enter key
+                  sendMessage();
+                }
+              }
+            }
           },
           { 
             view: "button", 
+            id: "sendButton",
             label: "Send", 
             width: 120,
-            click: async function() {
-              const userQuestion = $$("chatInput").getValue();
-              if (!userQuestion) return;
-              
-              $$("chatList").add({ text: "You: " + userQuestion });
-              $$("chatInput").setValue("");
-
-              $$("chatList").add({ text: "AI: Loading response..." });
-              const loadingId = $$("chatList").getLastId();
-
-              try {
-                const response = await askAI(userQuestion);
-                $$("chatList").updateItem(loadingId, { text: "AI: " + response });
-              } catch (error) {
-                $$("chatList").updateItem(loadingId, { text: "AI: Error - " + error.message });
-              }
-              
-              $$("chatList").showItem($$("chatList").getLastId());
-            }
+            click: sendMessage
           }
         ]
       }
     ]
   }
 });
+
+async function sendMessage() {
+  const userQuestion = $$("chatInput").getValue();
+  if (!userQuestion) return;
+  
+  // Add user message to chat
+  $$("chatList").add({ type: 'user', text: userQuestion });
+  $$("chatInput").setValue("");
+  
+  // Disable button during processing
+  $$("sendButton").disable();
+  
+  // Add loading message
+  $$("chatList").add({ type: 'loading', text: "Thinking..." });
+  const loadingId = $$("chatList").getLastId();
+  
+  // Scroll to the bottom
+  $$("chatList").showItem($$("chatList").getLastId());
+  
+  try {
+    // Get response from Ollama
+    const response = await askAI(userQuestion);
+    
+    // Replace loading message with AI response
+    $$("chatList").updateItem(loadingId, { type: 'ai', text: response });
+  } catch (error) {
+    // Update with error message
+    $$("chatList").updateItem(loadingId, { type: 'ai', text: "Error: " + error.message });
+  } finally {
+    // Re-enable button
+    $$("sendButton").enable();
+    
+    // Scroll to the bottom again to show the response
+    $$("chatList").showItem($$("chatList").getLastId());
+  }
+}
 </script>
 
 </body>

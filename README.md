@@ -120,6 +120,50 @@ You can extend the application by:
 - Review server logs in the terminal
 - Test the Ollama API directly using tools like curl or Postman
 
+## How the Application Works 
+
+### 1Component Architecture
+The application has three main parts:
+
+Frontend: A clean UI built with Webix components and styled with CSS
+Backend: A Node.js server using Express to handle API requests
+LLM Engine: Ollama running locally, processing the actual AI requests
+
+### 2. Data Flow
+When someone uses your app:
+
+The user clicks the robot icon in the toolbar to open the chat window
+They type a message and press Enter or click "Send"
+The message gets sent to your Node.js server via an API call
+Your server forwards this request to the locally running Ollama instance
+Ollama processes the request using the Llama 3.2 model
+The AI-generated response travels back through your server to the UI
+The response appears in the chat window as a message from the AI
+
+### 3. Key Technical Features
+
+Responsive Design: The chat bubbles properly wrap text and adjust to content length
+State Management: The UI shows loading indicators while waiting for responses
+Error Handling: Both the frontend and backend have proper error handling
+API Integration: Clean separation between frontend and AI communication
+
+### 4. For Developers
+If developers want to modify the application:
+
+The Webix UI components and styling are in index.html
+Server configuration and API handling are in server.js
+They can change the Ollama model by modifying the "model" parameter in server.js
+The application runs on port 8080 by default but can be changed
+
+### 5. Requirements
+To run the application:
+
+Node.js v18+ (for native fetch support)
+Ollama installed and running locally on port 11434
+The Llama 3.2 model pulled in Ollama
+
+The comprehensive README I provided gives all the details, including installation instructions, customization options, troubleshooting tips, and technical details. It should serve as a great guide for anyone who wants to understand, use, or modify your application.
+
 ## Technical Details
 
 ### Frontend

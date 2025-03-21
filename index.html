@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Webix + Ollama Demo</title>
+  
+  <!-- Webix from CDN -->
+  <script src="https://cdn.webix.com/edge/webix.js"></script>
+  <link rel="stylesheet" href="https://cdn.webix.com/edge/fonts/webix/webix.css">
+  <link rel="stylesheet" href="https://cdn.webix.com/edge/webix.css" />
+  <link rel="stylesheet" href="https://cdn.webix.com/edge/webix-font/webix-icons.css">
+
+
+  <!--Icons from MaterialDesign-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+
+  
+  <style>
+    /* 🟢 Fix: Ensure chatbox has rounded top corners */
+    .webix_window {
+      overflow: hidden !important;
+    }
+
+    .webix_window[id="aiPopup"] {
+      border-top-left-radius: 10px !important;
+      border-top-right-radius: 10px !important;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* 🟢 Fix: Properly apply header (toolbar) background */
+    .webix_window[id="aiPopup"] .webix_win_head {
+      background: #007acc !important;
+      color: white !important;
+      font-weight: bold !important;
+      border-top-left-radius: 10px !important;
+      border-top-right-radius: 10px !important;
+      height: 40px !important;
+      line-height: 40px !important;
+      padding-left: 10px !important;
+    }
+
+    /* 🟢 Fix: Close button is visible */
+    .webix_window[id="aiPopup"] .webix_win_head .webix_icon {
+      color: white !important;
+    }
+
+    /* 🟢 Fix: Ensure chat input field has rounded corners */
+    .webix_window[id="aiPopup"] .webix_el_text input {
+      border: 1px solid #007acc !important;
+      border-radius: 5px !important;
+      padding: 8px !important;
+      font-size: 14px !important;
+    }
+
+    /* 🟢 Fix: Ensure chat send button matches theme */
+    .webix_window[id="aiPopup"] .webix_el_button button {
+      background: #007acc !important;
+      color: white !important;
+      border-radius: 5px !important;
+      font-weight: bold !important;
+    }
+
+    /* 🟢 Fix: Chat messages list background */
+    .webix_window[id="aiPopup"] .webix_list {
+      background: #f2f9ff !important;
+      border: 1px solid #007acc !important;
+      border-radius: 5px !important;
+      padding: 5px !important;
+    }
+  </style>
+  
+</head>
+<body>
+
+<script>
+// -------------------------------
+// 1️⃣ askAI function: Calls Ollama via API
+// -------------------------------
+async function askAI(question) {
+  try {
+    const response = await fetch('/api/ollama/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: "llama3.2:latest",
+        prompt: question,
+        stream: false,
+        options: {
+          temperature: 0.7
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Ollama response:", data);
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    return data.response || "No response";
+  } catch (err) {
+    console.error("Ollama error:", err);
+    return `Error: ${err.message}. Make sure Ollama is running on port 11434`;
+  }
+}
+
+// -------------------------------
+// 2️⃣ Webix UI: Main Layout
+// -------------------------------
+webix.ui({
+  rows: [
+    // 🟢 Top Toolbar
+    {
+  view: "toolbar",
+  css: "webix_dark",
+  padding: 10,
+  elements: [
+    { 
+      view: "label",
+      label: "<span style='font-size:18px; color:white;'>Webix + Ollama Demo</span>" 
+    },
+    {
+      view: "icon", 
+      icon: "mdi mdi-robot-confused-outline",
+      css: "webix_icon mdi",  // Add this to ensure proper styling
+      tooltip: "Ask AI",
+      click: function() { $$("aiPopup").show(); }
+    }
+  ]
+},
+    // 🟢 Data Table
+    {
+      view: "datatable",
+      css: "webix_header_border",
+      columns: [
+        { id: "id", header: "ID", width: 60 },
+        { id: "task", header: "Task Name", fillspace: true },
+        { id: "delivery", header: "Delivery Date", width: 130 }
+      ],
+      data: [
+        { id: 1, task: "Check server logs", delivery: "2025-03-20" },
+        { id: 2, task: "Fix UI glitch", delivery: "2025-03-21" }
+      ]
+    }
+  ]
+});
+
+// -------------------------------
+// 3️⃣ Popup Window: AI Chat
+// -------------------------------
+webix.ui({
+  view: "window",
+  id: "aiPopup",
+  move: true,
+  width: 400,
+  height: 450,
+  position: "center",
+  head: {
+    view: "toolbar",
+    css: "webix_dark",
+    cols: [
+      { view: "label", 
+      label: "<span style='color:white;'>Ask AI</span>" },
+      {
+        view: "icon", 
+        icon: "wxi-close",
+        click: function() { $$("aiPopup").hide(); }
+      }
+    ]
+  },
+  body: {
+    rows: [
+      {
+        view: "list",
+        id: "chatList",
+        template: "#text#",
+        scroll: "y",
+        gravity: 3
+      },
+      {
+        height: 50,
+        cols: [
+          { 
+            view: "text", 
+            id: "chatInput", 
+            placeholder: "Type your question...",
+            gravity: 2
+          },
+          { 
+            view: "button", 
+            label: "Send", 
+            width: 120,
+            click: async function() {
+              const userQuestion = $$("chatInput").getValue();
+              if (!userQuestion) return;
+              
+              $$("chatList").add({ text: "You: " + userQuestion });
+              $$("chatInput").setValue("");
+
+              $$("chatList").add({ text: "AI: Loading response..." });
+              const loadingId = $$("chatList").getLastId();
+
+              try {
+                const response = await askAI(userQuestion);
+                $$("chatList").updateItem(loadingId, { text: "AI: " + response });
+              } catch (error) {
+                $$("chatList").updateItem(loadingId, { text: "AI: Error - " + error.message });
+              }
+              
+              $$("chatList").showItem($$("chatList").getLastId());
+            }
+          }
+        ]
+      }
+    ]
+  }
+});
+</script>
+
+</body>
+</html>

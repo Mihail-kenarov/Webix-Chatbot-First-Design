@@ -1,4 +1,3 @@
-const express = require('express');
 const chatService = require('./chat-service');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 

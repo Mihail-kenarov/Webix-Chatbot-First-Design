@@ -28,15 +28,10 @@ Before you begin, ensure you have the following installed:
 
 1. Clone this repository:
 
-   ```bash
-   git clone https://github.com/yourusername/webix-ollama-chat.git
-   cd webix-ollama-chat
-   ```
-
 2. Install the dependencies:
 
    ```bash
-   npm install
+   npm installw
    ```
 
 3. Start the server:
@@ -120,9 +115,10 @@ You can extend the application by:
 - Review server logs in the terminal
 - Test the Ollama API directly using tools like curl or Postman
 
-## How the Application Works 
+## How the Application Works
 
 ### 1Component Architecture
+
 The application has three main parts:
 
 Frontend: A clean UI built with Webix components and styled with CSS
@@ -130,6 +126,7 @@ Backend: A Node.js server using Express to handle API requests
 LLM Engine: Ollama running locally, processing the actual AI requests
 
 ### 2. Data Flow
+
 When someone uses your app:
 
 The user clicks the robot icon in the toolbar to open the chat window
@@ -148,6 +145,7 @@ Error Handling: Both the frontend and backend have proper error handling
 API Integration: Clean separation between frontend and AI communication
 
 ### 4. For Developers
+
 If developers want to modify the application:
 
 The Webix UI components and styling are in index.html
@@ -156,6 +154,7 @@ They can change the Ollama model by modifying the "model" parameter in server.js
 The application runs on port 8080 by default but can be changed
 
 ### 5. Requirements
+
 To run the application:
 
 Node.js v18+ (for native fetch support)

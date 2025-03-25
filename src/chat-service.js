@@ -2,6 +2,7 @@
 let conversationHistory = [];
 const MAX_HISTORY_LENGTH = 20;
 
+
 function addUserMessage(message) {
   conversationHistory.push({ role: 'user', content: message });
 }
@@ -21,7 +22,6 @@ function addAiResponse(message) {
 }
 
 
-
 function formatConversationPrompt() {
   let fullPrompt = '';
   
@@ -38,15 +38,9 @@ function formatConversationPrompt() {
 
 
 
-function clearHistory() {
-  conversationHistory = [];
-}
-
-
 
 module.exports = {
   addUserMessage,
   addAiResponse,
   formatConversationPrompt,
-  clearHistory
 };

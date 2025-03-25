@@ -52,15 +52,6 @@ function setupRoutes(app) {
     }
   });
 
-
-
-
- // Clear history endpoint
-  app.post('/api/chat/clear', (req, res) => {
-    chatService.clearHistory();
-    res.json({ message: 'History cleared' });
-  });
-
   // Proxy middleware for Ollama
   const ollamaProxy = createProxyMiddleware({
     target: 'http://localhost:11434',

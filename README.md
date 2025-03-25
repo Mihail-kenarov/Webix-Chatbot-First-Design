@@ -4,11 +4,11 @@ A modern, responsive chat interface for interacting with locally-running Ollama 
 
 ## Features
 
-- 💬 Clean, modern chat interface
+- 💬 Clean chat interface
 - 🤖 Direct integration with locally-running Ollama LLMs
 - 🚀 Fast responses with optimized data handling
 - 📱 Responsive design that works on various screen sizes
-- 🎨 Beautiful UI powered by Webix components and Material Design icons
+- 🎨 UI powered by Webix components and Material Design icons
 - ⚡ Node.js backend with Express for handling API requests
 
 ## Prerequisites

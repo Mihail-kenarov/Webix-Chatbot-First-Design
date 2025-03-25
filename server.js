@@ -15,6 +15,10 @@ app.use(bodyParser.json());
 // Serve static files
 app.use(express.static('./'));
 
+// Store conversation history in memory (simple implementation)
+let conversationHistory = [];
+const MAX_HISTORY_LENGTH = 20; // Keep the last 20 messages
+
 // Direct API endpoint to Ollama
 app.post('/api/chat', async (req, res) => {
   try {
@@ -23,12 +27,29 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: "No message provided." });
     }
 
+    // Add user message to history
+    conversationHistory.push({ role: 'user', content: userMessage });
+    
+    // Format the prompt with conversation history
+    let fullPrompt = '';
+    
+    // Format the history into a conversation format
+    conversationHistory.forEach((msg) => {
+      if (msg.role === 'user') {
+        fullPrompt += `Human: ${msg.content}\n`;
+      } else {
+        fullPrompt += `Assistant: ${msg.content}\n`;
+      }
+    });
+    
+    fullPrompt += 'Assistant: '; // Prompt the model to respond as assistant
+
     // Call the locally running Ollama server using native fetch (Node.js 18+)
     const response = await fetch("http://localhost:11434/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        prompt: userMessage,
+        prompt: fullPrompt,
         model: "llama3.2:latest",  // Using llama3.2 as specified
         stream: false              // No streaming for simplicity
       })
@@ -45,13 +66,31 @@ app.post('/api/chat', async (req, res) => {
 
     // Parse the JSON response from Ollama
     const data = await response.json();
+    const aiResponse = data.response || "[No response]";
+    
+    // Add AI response to history
+    conversationHistory.push({ role: 'assistant', content: aiResponse });
+    
+    // Trim history if it exceeds the maximum length
+    if (conversationHistory.length > MAX_HISTORY_LENGTH) {
+      // Remove oldest messages
+      conversationHistory = conversationHistory.slice(
+        conversationHistory.length - MAX_HISTORY_LENGTH
+      );
+    }
     
     // Send the response back to the client
-    res.json({ text: data.response || "[No response]" });
+    res.json({ text: aiResponse });
   } catch (error) {
     console.error("Error in /api/chat:", error);
     res.status(500).json({ error: "Server error while generating text." });
   }
+});
+
+// API endpoint to clear chat history
+app.post('/api/chat/clear', (req, res) => {
+  conversationHistory = [];
+  res.json({ message: 'History cleared' });
 });
 
 // Proxy middleware for Ollama

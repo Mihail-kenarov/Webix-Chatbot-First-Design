@@ -2,8 +2,6 @@
 
 A modern, responsive chat interface for interacting with locally-running Ollama LLMs, built with the Webix UI framework.
 
-![Webix-Ollama Chat Demo](https://via.placeholder.com/800x450.png?text=Webix-Ollama+Chat+Demo)
-
 ## Features
 
 - 💬 Clean, modern chat interface
@@ -26,7 +24,7 @@ Before you begin, ensure you have the following installed:
 
 ## Installation
 
-1. Clone this repository:
+1. Clone this repository.
 
 2. Install the dependencies:
 
@@ -95,7 +93,6 @@ The styling is defined in the `<style>` section of `index.html`. You can modify 
 
 You can extend the application by:
 
-- Adding message history persistence
 - Implementing user authentication
 - Supporting file uploads/attachments
 - Enabling voice input/output

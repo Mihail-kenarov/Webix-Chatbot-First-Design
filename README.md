@@ -31,7 +31,7 @@ Before you begin, ensure you have the following installed:
 2. Install the dependencies:
 
    ```bash
-   npm installw
+   npm install
    ```
 
 3. Start the server:

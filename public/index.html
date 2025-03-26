@@ -21,21 +21,10 @@
       font-family: 'Segoe UI', sans-serif;
     }
 
-    .blue-head .webix_win_head .webix_template {
-      background: #007acc !important;
-      color: white !important;
-      font-weight: bold;
-    }
-
     .webix_window[id="aiPopup"] {
       border-radius: 12px !important;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
       overflow: hidden !important;
-    }
-
-    .webix_window[id="aiPopup"] .webix_win_head>.webix_view>.webix_template {
-      background: #007acc !important;
-      color: white !important;
     }
 
     .webix_window[id="aiPopup"] .webix_win_head {
@@ -46,10 +35,6 @@
       align-items: center;
     }
 
-    .webix_window[id="aiPopup"] .webix_win_head .webix_icon {
-      color: white !important;
-    }
-
     .webix_window[id="aiPopup"] .webix_el_text input {
       border: 1px solid #007acc !important;
       border-radius: 6px !important;
@@ -58,7 +43,7 @@
     }
 
     .webix_window[id="aiPopup"] .webix_el_button button {
-      background: #007acc !important;
+      background: #3498db !important; /* Updated to specified blue #3498db */
       color: white !important;
       border-radius: 6px !important;
       font-weight: bold !important;
@@ -114,7 +99,7 @@
 
     /* Add this CSS rule to target toolbar in the window head */
     .blue-head .webix_win_head .webix_toolbar {
-      background: #007acc !important;
+      background: #3498db !important; /* Updated to specified blue #3498db */
     }
     
     .blue-head .webix_win_head .webix_toolbar .webix_el_label span {
@@ -124,6 +109,50 @@
     /* Ensure icons in the header are white */
     .blue-head .webix_win_head .webix_icon {
       color: white !important;
+    }
+
+    /* Understanding Webix styling: */
+  
+    /* 1. Webix uses complex nested DOM structures */
+    .blue-head .webix_win_head .webix_template {
+      /* This targets template-based headers */
+      background: #3498db !important; /* Updated to specified blue #3498db */
+      color: white !important;
+      font-weight: bold;
+    }
+  
+    /* 2. Different components need different selectors */
+    .blue-head .webix_win_head .webix_toolbar {
+      /* This targets toolbar-based headers */
+      background: #3498db !important; /* Updated to specified blue #3498db */
+    }
+  
+    /* 3. Sometimes ID-based selectors are needed for specificity */
+    .webix_window[id="aiPopup"] .webix_win_head>.webix_view>.webix_template {
+      /* This targets a specific window with higher specificity */
+      background: #3498db !important; /* Updated to specified blue #3498db */
+      color: white !important;
+    }
+  
+    /* Future styling guidance example:
+       Use CSS variables for consistent theming */
+    :root {
+      --primary-color: #3498db; /* Updated to specified blue #3498db */
+      --message-user-bg: #d0ebff;
+      --message-ai-bg: #eaeaea;
+      --border-radius: 12px;
+    }
+  
+    /* Then use these variables in your styles */
+    .blue-head .webix_win_head .webix_toolbar {
+      background: var(--primary-color) !important;
+    }
+  
+    /* Example of targeting chat messages with variables */
+    .user-message {
+      background-color: var(--message-user-bg);
+      border-radius: calc(var(--border-radius) * 1.5);
+      /* other properties... */
     }
   </style>
   

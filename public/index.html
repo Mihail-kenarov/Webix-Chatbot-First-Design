@@ -16,88 +16,83 @@
 
   
   <style>
-    /* 🟢 Fix: Ensure chatbox has rounded top corners */
-    .webix_window {
-      overflow: hidden !important;
+     body {
+      background-color: #f4f7fb;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .blue-head .webix_win_head .webix_template {
+      background: #007acc !important;
+      color: white !important;
+      font-weight: bold;
     }
 
     .webix_window[id="aiPopup"] {
-      border-top-left-radius: 10px !important;
-      border-top-right-radius: 10px !important;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+      overflow: hidden !important;
     }
 
-    /* 🟢 Fix: Properly apply header (toolbar) background */
-    .webix_window[id="aiPopup"] .webix_win_head {
+    .webix_window[id="aiPopup"] .webix_win_head>.webix_view>.webix_template {
       background: #007acc !important;
       color: white !important;
-      font-weight: bold !important;
-      border-top-left-radius: 10px !important;
-      border-top-right-radius: 10px !important;
-      height: 40px !important;
-      line-height: 40px !important;
-      padding-left: 10px !important;
     }
 
-    /* 🟢 Fix: Close button is visible */
+    .webix_window[id="aiPopup"] .webix_win_head {
+      border-radius: 12px 12px 0 0 !important;
+      height: 44px !important;
+      padding-left: 14px !important;
+      display: flex;
+      align-items: center;
+    }
+
     .webix_window[id="aiPopup"] .webix_win_head .webix_icon {
       color: white !important;
     }
 
-    /* 🟢 Fix: Ensure chat input field has rounded corners */
     .webix_window[id="aiPopup"] .webix_el_text input {
       border: 1px solid #007acc !important;
-      border-radius: 5px !important;
-      padding: 8px !important;
-      font-size: 14px !important;
+      border-radius: 6px !important;
+      padding: 10px !important;
+      font-size: 15px !important;
     }
 
-    /* 🟢 Fix: Ensure chat send button matches theme */
     .webix_window[id="aiPopup"] .webix_el_button button {
       background: #007acc !important;
       color: white !important;
-      border-radius: 5px !important;
+      border-radius: 6px !important;
       font-weight: bold !important;
+      font-size: 15px;
     }
 
-    /* 🟢 Fix: Chat messages list background */
     .webix_window[id="aiPopup"] .webix_list {
-      background: #f2f9ff !important;
-      border: 1px solid #007acc !important;
-      border-radius: 5px !important;
-      padding: 5px !important;
+      background: #fdfefe !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 8px !important;
     }
 
-    /* Message styling with fixed word wrap */
     .user-message {
-      background-color: #e6f2ff;
-      padding: 8px 12px;
-      border-radius: 12px;
-      margin: 4px 20px 4px 4px;
+      background-color: #d0ebff;
+      padding: 10px 14px;
+      border-radius: 18px;
+      margin: 6px 20px 6px 6px;
       text-align: right;
-      align-self: flex-end;
-      width: auto;
-      max-width: 80%;
-      word-wrap: break-word;
-      white-space: normal;
-      display: inline-block;
       float: right;
       clear: both;
+      max-width: 80%;
+      word-wrap: break-word;
     }
 
     .ai-message {
-      background-color: #f0f0f0;
-      padding: 8px 12px;
-      border-radius: 12px;
-      margin: 4px 4px 4px 20px;
-      text-align: left;
-      width: auto;
-      max-width: 80%;
-      word-wrap: break-word;
-      white-space: normal;
-      display: inline-block;
+      background-color: #eaeaea;
+      padding: 10px 14px;
+      border-radius: 18px;
+      margin: 6px 6px 6px 20px;
       float: left;
       clear: both;
+      max-width: 80%;
+      word-wrap: break-word;
     }
 
     .loading-indicator {
@@ -105,18 +100,30 @@
       font-style: italic;
     }
 
-    /* Clear float for better message display */
     .message-wrapper {
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       width: 100%;
     }
 
-    /* Custom list styling to fix word wrapping */
     .chat-list .webix_list_item {
       padding: 0 !important;
       height: auto !important;
       line-height: normal !important;
+    }
+
+    /* Add this CSS rule to target toolbar in the window head */
+    .blue-head .webix_win_head .webix_toolbar {
+      background: #007acc !important;
+    }
+    
+    .blue-head .webix_win_head .webix_toolbar .webix_el_label span {
+      color: white !important;
+    }
+    
+    /* Ensure icons in the header are white */
+    .blue-head .webix_win_head .webix_icon {
+      color: white !important;
     }
   </style>
   
@@ -208,6 +215,7 @@ webix.ui({
 webix.ui({
   view: "window",
   id: "aiPopup",
+  css: "blue-head",  // Changed from red-head to blue-head
   move: true,
   resize:true,
   width: 400,
@@ -215,10 +223,10 @@ webix.ui({
   position: "center",
   head: {
     view: "toolbar",
-    css: "webix_dark",
+    css: "header-toolbar", // Add a specific class to the toolbar
     cols: [
       { view: "label", 
-        label: "<span style='color:white;'>Ask AI</span>" },
+        label: "<span>Ask AI</span>" }, // Remove inline style
       {
         view: "icon", 
         icon: "wxi-close",
@@ -241,7 +249,7 @@ webix.ui({
           } else if (obj.type === 'loading') {
             return `<div class="message-wrapper"><div class="ai-message loading-indicator">${obj.text}</div></div>`;
           } else { // AI
-            return `<div class="message-wrapper"><div class="ai-message">${obj.text}</div></div>`;
+            return `<div class="message-wrapper"><div class="ai-message">${obj.text}</div></div>`; // Removed extra backtick here
           }
         },
         scroll: "y",
@@ -252,7 +260,7 @@ webix.ui({
         height: 50,
         cols: [
           { 
-            view: "textarea", 
+            view: "text", 
             id: "chatInput", 
             placeholder: "Type your question...",
             gravity: 2,

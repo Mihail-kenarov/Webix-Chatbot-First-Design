@@ -14,7 +14,10 @@
   <!--Icons from MaterialDesign-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
 
-  
+  <!-- Add Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+
   <style>
      body {
       background-color: #f4f7fb;
@@ -78,6 +81,37 @@
       clear: both;
       max-width: 80%;
       word-wrap: break-word;
+    }
+
+    /* Style markdown elements inside AI messages */
+    .ai-message ul, .ai-message ol {
+      padding-left: 20px;
+      margin: 8px 0;
+    }
+    
+    .ai-message pre {
+      background-color: #f0f0f0;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    
+    .ai-message code {
+      background-color: #f0f0f0;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+    
+    .ai-message blockquote {
+      border-left: 3px solid #ccc;
+      padding-left: 8px;
+      margin-left: 0;
+      color: #555;
+    }
+    
+    .ai-message input[type="checkbox"] {
+      margin-right: 6px;
     }
 
     .loading-indicator {
@@ -278,7 +312,10 @@ webix.ui({
           } else if (obj.type === 'loading') {
             return `<div class="message-wrapper"><div class="ai-message loading-indicator">${obj.text}</div></div>`;
           } else { // AI
-            return `<div class="message-wrapper"><div class="ai-message">${obj.text}</div></div>`; // Removed extra backtick here
+            // Parse markdown and sanitize HTML
+            const parsedMarkdown = marked.parse(obj.text || "");
+            const sanitizedHtml = DOMPurify.sanitize(parsedMarkdown);
+            return `<div class="message-wrapper"><div class="ai-message">${sanitizedHtml}</div></div>`;
           }
         },
         scroll: "y",

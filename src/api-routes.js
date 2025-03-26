@@ -38,6 +38,8 @@ function setupRoutes(app) {
 
       // Parse the JSON response from Ollama
       const data = await response.json();
+      
+      // Preserve any markdown formatting in the response
       const aiResponse = data.response || "[No response]";
       
       // Add AI response to history

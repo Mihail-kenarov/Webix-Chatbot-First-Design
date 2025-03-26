@@ -64,21 +64,21 @@
       background-color: #d0ebff;
       padding: 10px 14px;
       border-radius: 18px;
-      margin: 6px 20px 6px 6px;
+      margin: 3px 20px 3px 6px; /* Slightly reduced margins */
       text-align: right;
       float: right;
-      clear: both;
+      clear: both; /* Ensures messages don't overlap */
       max-width: 80%;
       word-wrap: break-word;
     }
 
     .ai-message {
       background-color: #eaeaea;
-      padding: 10px 14px;
+      padding: 1px 14px; /* Reduced top/bottom padding to 1px as requested */
       border-radius: 18px;
-      margin: 6px 6px 6px 20px;
+      margin: 3px 6px 3px 20px; /* Slightly reduced margins */
       float: left;
-      clear: both;
+      clear: both; /* Ensures messages don't overlap */
       max-width: 80%;
       word-wrap: break-word;
     }
@@ -86,7 +86,7 @@
     /* Style markdown elements inside AI messages */
     .ai-message ul, .ai-message ol {
       padding-left: 20px;
-      margin: 8px 0;
+      margin: 4px 0; /* Reduced margins */
     }
     
     .ai-message pre {
@@ -117,11 +117,23 @@
     .loading-indicator {
       color: #888;
       font-style: italic;
+      min-width: 120px; /* Ensure minimum width */
+    }
+    
+    /* Special styling for the loading message bubble */
+    .ai-message.loading-indicator {
+      background-color: #f0f0f0; /* Lighter background */
+      padding: 8px 16px; /* More horizontal padding */
+      border-radius: 16px;
+      text-align: center; /* Center the text */
+      min-width: 120px;
+      display: inline-block; /* Allow it to size to content */
+      width: auto; /* Let it be as wide as needed */
     }
 
     .message-wrapper {
       overflow: hidden;
-      margin-bottom: 10px;
+      margin-bottom: 5px; /* Reduced for less space between messages */
       width: 100%;
     }
 
@@ -310,7 +322,10 @@ webix.ui({
           if (obj.type === 'user') {
             return `<div class="message-wrapper"><div class="user-message">${obj.text}</div></div>`;
           } else if (obj.type === 'loading') {
-            return `<div class="message-wrapper"><div class="ai-message loading-indicator">${obj.text}</div></div>`;
+            // Improved loading indicator with wider styling
+            return `<div class="message-wrapper"><div class="ai-message loading-indicator">
+              ${obj.text}<span class="dots">...</span>
+            </div></div>`;
           } else { // AI
             // Parse markdown and sanitize HTML
             const parsedMarkdown = marked.parse(obj.text || "");
